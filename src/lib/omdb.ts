@@ -1,4 +1,4 @@
-const OMDB_API_KEY = "2f656131";
+const OMDB_API_KEY = "27f2cbd3";
 const OMDB_BASE = "https://www.omdbapi.com/";
 
 const posterCache = new Map<string, string | null>();
