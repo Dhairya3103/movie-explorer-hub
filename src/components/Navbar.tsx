@@ -1,5 +1,5 @@
 import { Link, useLocation } from "react-router-dom";
-import { Film, Search, BarChart3, Home } from "lucide-react";
+import { Film, Search, ChartBar as BarChart3, Chrome as Home } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const navItems = [
@@ -12,12 +12,12 @@ export function Navbar() {
   const location = useLocation();
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
+    <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border/30 bg-background/95 backdrop-blur-sm">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <Film className="h-7 w-7 text-primary" />
           <span className="font-display text-2xl tracking-wider text-primary">
-            CineVault
+            MovieLocker
           </span>
         </Link>
         <div className="flex items-center gap-1">
