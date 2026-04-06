@@ -2,11 +2,38 @@ import { useParams, Link } from "react-router-dom";
 import { ArrowLeft, Star, Clock, DollarSign, TrendingUp, Users, Calendar, Globe } from "lucide-react";
 import { useMovies } from "@/contexts/MovieContext";
 import { LoadingScreen } from "@/components/LoadingScreen";
+import { MovieCard } from "@/components/MovieCard";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import { formatCurrency } from "@/lib/movieData";
 import { usePoster } from "@/hooks/usePoster";
+
+function getSimilarMovies(currentMovie: any, allMovies: any[], limit: number = 6): any[] {
+  const similarities = allMovies
+    .filter((m) => m.id !== currentMovie.id)
+    .map((movie) => {
+      let score = 0;
+
+      currentMovie.genres.forEach((genre: string) => {
+        if (movie.genres.includes(genre)) score += 20;
+      });
+
+      if (Math.abs(movie.vote_average - currentMovie.vote_average) <= 1) score += 15;
+      if (Math.abs(movie.year - currentMovie.year) <= 3) score += 10;
+
+      currentMovie.keywords.forEach((keyword: string) => {
+        if (movie.keywords.includes(keyword)) score += 5;
+      });
+
+      return { movie, score };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, limit)
+    .map(({ movie }) => movie);
+
+  return similarities;
+}
 
 export default function MovieDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -24,10 +51,12 @@ export default function MovieDetailPage() {
     );
   }
 
-  return <MovieDetailContent movie={movie} />;
+  const similarMovies = getSimilarMovies(movie, movies);
+
+  return <MovieDetailContent movie={movie} similarMovies={similarMovies} />;
 }
 
-function MovieDetailContent({ movie }: { movie: any }) {
+function MovieDetailContent({ movie, similarMovies }: { movie: any; similarMovies: any[] }) {
   const poster = usePoster(movie.title, movie.year);
 
   const profit = movie.revenue - movie.budget;
@@ -188,6 +217,17 @@ function MovieDetailContent({ movie }: { movie: any }) {
             <div className="flex flex-wrap gap-2">
               {movie.production_companies.map((c: string) => (
                 <Badge key={c} variant="outline" className="text-xs">{c}</Badge>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {similarMovies.length > 0 && (
+          <section className="space-y-4 border-t border-border pt-10">
+            <h2 className="font-display text-3xl text-foreground">Similar Movies</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+              {similarMovies.map((similarMovie) => (
+                <MovieCard key={similarMovie.id} movie={similarMovie} size="sm" />
               ))}
             </div>
           </section>
